@@ -5,6 +5,13 @@
 
     <data>
 
+        <import type="android.view.View" />
+
+        <variable
+            name="IsCoverage"
+            type="Boolean"
+            android:value="false" />
+
         <variable
             name="districtsItem"
             type="com.bosta.bostatask.domain.models.DistrictModel" />
@@ -13,46 +20,55 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
-        android:layout_marginVertical="4dp"
-        android:background="@drawable/districts_bg"
-        android:elevation="1dp"
-        android:paddingHorizontal="18dp"
-        android:paddingVertical="14dp">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/district_name_TV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{districtsItem.districtName}"
+            android:text='@{districtsItem.districtName + " - " + districtsItem.zoneName}'
             android:textAlignment="viewStart"
+            android:layout_marginVertical="10dp"
             android:textColor="@color/black"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:translationZ="1dp"
-            app:layout_constraintBottom_toTopOf="@+id/coverage_TV"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="zara" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/coverage_TV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:text="@{districtsItem.coverage}"
-            android:textAlignment="viewStart"
-            android:textColor="#7E7E7E"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:translationZ="1dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/district_name_TV"
-            tools:text="Branch 1 Address" />
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:id="@+id/coverage_container"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginVertical="10dp"-->
+<!--            android:visibility="@{districtsItem.dropOffAvailability ? View.INVISIBLE : View.INVISIBLE}"-->
+<!--            android:background="@drawable/unselected_bg"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/district_name_TV"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/district_name_TV"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/district_name_TV">-->
+
+<!--            <com.google.android.material.textview.MaterialTextView-->
+<!--                android:id="@+id/coverage_TV"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:padding="10dp"-->
+<!--                android:text="@{districtsItem.coverage}"-->
+<!--                android:textAlignment="center"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="normal"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                tools:text="test" />-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

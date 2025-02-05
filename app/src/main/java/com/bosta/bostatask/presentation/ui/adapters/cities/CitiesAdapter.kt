@@ -7,27 +7,55 @@ import com.bosta.bostatask.domain.models.CityModel
 import androidx.recyclerview.widget.ListAdapter
 
 
-class CitiesAdapter(val onClickListener: CitiesOnClickListener) :
-    ListAdapter<CityModel, CitiesAdapterViewHolder>(CitiesDataDC()) {
+class CitiesAdapter(
+    val onClickListener: CitiesOnClickListener,
+) : ListAdapter<CityModel, CitiesAdapterViewHolder>(CitiesDataDC()) {
+
+
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int
     ): CitiesAdapterViewHolder = CitiesAdapterViewHolder(
         binding = CitiesRowItemBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
-        ), onClickListener = onClickListener
-
+        ), onClickListener = onClickListener, expandedItems = expandedItems
     )
 
-    override fun onBindViewHolder(holder: CitiesAdapterViewHolder, position: Int) =
-        holder.bind(item = getItem(position), selectedItemId = selectedItemId)
-
-
-    fun setSelectedItemId(id: String) {
-        if (selectedItemId == id) return
-        selectedItemId = id
-        notifyDataSetChanged()
+    override fun onBindViewHolder(holder: CitiesAdapterViewHolder, position: Int) {
+        holder.bind(
+            item = getItem(position), searchQuery = searchQuery
+        )
     }
 
-    private var selectedItemId: String? = null
+    private val expandedItems = mutableSetOf<String>()
+    fun removeAllExpandedItems() {
+        expandedItems.clear()
+    }
+
+
+    private var searchQuery: String = ""
+    private val originalCitiesList = mutableListOf<CityModel>()
+
+    fun searchCitiesReturnCount(query: String): Int {
+        searchQuery = query
+        val result = if (query.isNotEmpty()) originalCitiesList.filter { city ->
+            city.cityName?.contains(query, true) ?: false || city.districts?.any { district ->
+                district.districtName?.contains(query, true) ?: false
+            } ?: false
+        } else originalCitiesList
+
+        submitList(result)
+        notifyDataSetChanged()
+        return result.size
+    }
+
+
+    fun setCitiesList(data: List<CityModel>?) {
+        originalCitiesList.clear()
+        if (data != null) {
+            originalCitiesList.addAll(data)
+        }
+        submitList(data)
+
+    }
 
 }

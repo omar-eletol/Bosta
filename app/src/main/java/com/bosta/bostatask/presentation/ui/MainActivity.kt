@@ -1,6 +1,5 @@
 package com.bosta.bostatask.presentation.ui
 
-
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -10,12 +9,15 @@ import com.bosta.bostatask.R
 import com.bosta.bostatask.databinding.MainActivityBinding
 import com.bosta.bostatask.domain.models.CityModel
 import com.bosta.bostatask.presentation.core.BaseActivity
+import com.bosta.bostatask.presentation.core.attachDivider
 import com.bosta.bostatask.presentation.ui.adapters.cities.CitiesAdapter
 import com.bosta.bostatask.presentation.ui.adapters.cities.CitiesOnClickListener
-import com.bosta.bostatask.presentation.ui.adapters.districts.DistrictsAdapter
-import com.bosta.bostatask.presentation.ui.states.DistrictsState
 import com.bosta.bostatask.presentation.ui.states.MainState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -24,15 +26,16 @@ class MainActivity : BaseActivity<MainActivityBinding>(R.layout.main_activity),
 
     private val viewModel by viewModels<MainViewModel>()
     private val citiesAdapter by lazy { CitiesAdapter(onClickListener = this) }
-    private val districtsAdapter by lazy { DistrictsAdapter() }
 
+    @OptIn(FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 
+        binding.viewModel = this.viewModel
         binding.citiesRecyclerView.adapter = citiesAdapter
-        binding.districtsRecyclerView.adapter = districtsAdapter
         binding.citiesOnClickListener = this
+        binding.citiesRecyclerView.attachDivider()
 
 
 
@@ -54,9 +57,7 @@ class MainActivity : BaseActivity<MainActivityBinding>(R.layout.main_activity),
                         is MainState.Success -> {
                             binding.swipeRefresher.alpha = 1f
                             binding.hasError = false
-
-                            citiesAdapter.submitList(result.data.data)
-                            viewModel.emitAction(action = MainActions.OnItemClicked(cityItem = result.data.data?.first()))
+                            citiesAdapter.setCitiesList(result.data.data)
                         }
 
                         MainState.Empty -> {
@@ -75,45 +76,22 @@ class MainActivity : BaseActivity<MainActivityBinding>(R.layout.main_activity),
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.districtsState.collect { result ->
-                    when (result) {
-                        is DistrictsState.Loading -> {
-                            binding.hasError = false
-                        }
-
-                        is DistrictsState.Error -> {
-                            binding.hasError = true
-
-                        }
-
-                        is DistrictsState.Success -> {
-                            binding.hasError = false
-                            districtsAdapter.submitList(result.data)
-                        }
-
-                        DistrictsState.Empty -> {
-                            binding.hasError = true
-
-                        }
-
-                        DistrictsState.Idle -> {
-                            binding.hasError = false
-
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actions.collect { action ->
                     when (action) {
                         MainActions.FetchCitiesAndDistrictsList -> fetchCitiesDistrictsList()
                         is MainActions.OnItemClicked -> {
-                            citiesAdapter.setSelectedItemId(id = action.cityItem?.cityId ?: "")
-                            getDistrictsList(action.cityItem)
+                            citiesAdapter.notifyItemChanged(action.adapterPosition)
                         }
+
+                        is MainActions.SearchCities -> {
+                            binding.clearTextIcon = action.query.isNotEmpty()
+                            searchCities(query = action.query)
+                            if (action.query.isEmpty()) {
+                                citiesAdapter.removeAllExpandedItems()
+                            }
+                        }
+
+                        MainActions.ClearSearchText -> TODO()
                     }
                 }
             }
@@ -121,8 +99,21 @@ class MainActivity : BaseActivity<MainActivityBinding>(R.layout.main_activity),
 
         }
 
-        viewModel.emitAction(action = MainActions.FetchCitiesAndDistrictsList)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.search.debounce(200).distinctUntilChanged().filterNotNull()
+                    .collect { query ->
+                        viewModel.emitAction(
+                            action = MainActions.SearchCities(
+                                query = query
+                            )
+                        )
+                    }
+            }
+        }
 
+
+        viewModel.emitAction(action = MainActions.FetchCitiesAndDistrictsList)
 
     }
 
@@ -130,16 +121,24 @@ class MainActivity : BaseActivity<MainActivityBinding>(R.layout.main_activity),
         viewModel.fetchCitiesDistrictsList()
     }
 
-    private fun getDistrictsList(cityItem: CityModel?) {
-        viewModel.getDistrictsList(cityItem = cityItem)
+    private fun searchCities(query: String) {
+        val count = citiesAdapter.searchCitiesReturnCount(query = query)
+        binding.isEmpty = count == 0
     }
 
-    override fun onItemClick(cityItem: CityModel) {
-        viewModel.emitAction(action = MainActions.OnItemClicked(cityItem = cityItem))
+
+    override fun onItemClick(cityItem: CityModel, adapterPosition: Int) {
+        viewModel.emitAction(
+            action = MainActions.OnItemClicked(
+                cityItem = cityItem,
+                adapterPosition = adapterPosition
+            )
+        )
 
     }
 
     override fun fetchCitiesDistricts() {
+        viewModel.search.value = ""
         viewModel.emitAction(action = MainActions.FetchCitiesAndDistrictsList)
     }
 

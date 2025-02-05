@@ -4,7 +4,7 @@ import com.bosta.bostatask.domain.models.CityModel
 
 
 interface CitiesOnClickListener {
-    fun onItemClick(cityItem: CityModel)
+    fun onItemClick(cityItem: CityModel ,  adapterPosition: Int)
     fun fetchCitiesDistricts()
 
 }

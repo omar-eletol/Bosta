@@ -1,7 +1,7 @@
 package com.bosta.bostatask.domain.models
 
 data class CitiesDistrictsResponse(
-    val `data`: List<CityModel?>?,
+    val `data`: List<CityModel>?,
     val message: String?,
     val success: Boolean?
 )
@@ -11,7 +11,7 @@ data class CityModel(
     val cityId: String?,
     val cityName: String?,
     val cityOtherName: String?,
-    val districts: List<DistrictModel?>?,
+    val districts: List<DistrictModel>?,
     val dropOffAvailability: Boolean?,
     val pickupAvailability: Boolean?
 )

@@ -2,10 +2,8 @@ package com.bosta.bostatask.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bosta.bostatask.domain.models.CityModel
 import com.bosta.bostatask.domain.usecases.GetCitiesUseCase
 import com.bosta.bostatask.domain.usecases.GetDistrictsUseCase
-import com.bosta.bostatask.presentation.ui.states.DistrictsState
 import com.bosta.bostatask.presentation.ui.states.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +20,11 @@ class MainViewModel @Inject constructor(
     private val getCitiesUseCase: GetCitiesUseCase,
     private val getDistrictsUseCase: GetDistrictsUseCase
 ) : ViewModel() {
+
+    val search = MutableStateFlow<String?>(null)
+    fun clearSearch() {
+        search.value = ""
+    }
 
     private val _actions = Channel<MainActions>()
     val actions = _actions.receiveAsFlow()
@@ -45,25 +48,6 @@ class MainViewModel @Inject constructor(
                     throwable = t,
                     errorBody = if (t is HttpException) t.response()?.errorBody()
                         ?.string() else null
-                )
-            }
-        )
-    }
-
-
-    private val _districtsState = MutableStateFlow<DistrictsState>(DistrictsState.Idle)
-    val districtsState get() = _districtsState.asStateFlow()
-
-    fun getDistrictsList(cityItem: CityModel?) = viewModelScope.launch(Dispatchers.IO) {
-        _districtsState.emit(DistrictsState.Loading)
-        _districtsState.emit(
-            try {
-                val districtList = getDistrictsUseCase.invoke(cityItem = cityItem)
-                if (districtList?.isEmpty() == true) DistrictsState.Empty
-                else DistrictsState.Success(data = districtList)
-            } catch (t: Throwable) {
-                DistrictsState.Error(
-                    throwable = t, errorBody = "something went wrong"
                 )
             }
         )

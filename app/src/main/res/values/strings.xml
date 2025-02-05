@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">BostaTask</string>
     <string name="sorry_there_are_no_matching_results">Sorry, there are no matching results</string>
+    <string name="city_area">City/Area</string>
+    <string name="choose_the_delivery_area">Choose the delivery area</string>
 
 </resources>

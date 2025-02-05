@@ -21,68 +21,83 @@
             type="Boolean" />
 
         <variable
+            name="clearTextIcon"
+            type="Boolean" />
+
+        <variable
             name="citiesOnClickListener"
             type="com.bosta.bostatask.presentation.ui.adapters.cities.CitiesOnClickListener" />
+
+        <variable
+            name="viewModel"
+            type="com.bosta.bostatask.presentation.ui.MainViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/title_TV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/choose_the_delivery_area"
+            android:textAlignment="viewStart"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/cities_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cities_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/title_TV">
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/citiesRecyclerView"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/search_ET"
+                style="@style/input_style"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="14dp"
                 android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:drawableEnd="@{clearTextIcon ? @drawable/ic_exit : @drawable/ic_search}"
+                android:hint="@string/city_area"
+                android:inputType="text"
+                android:maxLines="1"
+                app:onDrawableEndClick="@{() -> viewModel.clearSearch()}"
+                android:text="@={viewModel.search}"
+                android:textColorHint="@color/hintColor"
                 app:layout_constraintBottom_toTopOf="@+id/swipeRefresher"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/cities_row_item" />
-
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/shimmer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/district_shimmer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:loadShimmerView="@{isLoading}"
-                tools:visibility="visible">
-
-                <include layout="@layout/city_item_placeholder_layout" />
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipeRefresher"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="15dp"
-                android:paddingHorizontal="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/citiesRecyclerView"
+                app:layout_constraintTop_toBottomOf="@+id/search_ET"
                 app:onRefreshListener="@{() -> citiesOnClickListener.fetchCitiesDistricts()}"
                 app:refreshing="@{isLoading}">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/districtsRecyclerView"
+                    android:id="@+id/citiesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="15dp"
@@ -90,7 +105,7 @@
                     android:overScrollMode="never"
                     android:visibility="@{isEmpty || hasError || isLoading ? View.GONE : View.VISIBLE}"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/districts_row_item" />
+                    tools:listitem="@layout/cities_row_item" />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -103,11 +118,11 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/shimmer"
+                app:layout_constraintTop_toBottomOf="@+id/search_ET"
                 app:loadShimmerView="@{isLoading}"
                 tools:visibility="visible">
 
-                <include layout="@layout/district_item_placeholder_layout" />
+                <include layout="@layout/cities_item_placeholder_layout" />
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -128,7 +143,7 @@
                 android:id="@+id/search_icon_partner"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:src="@drawable/ic_search_icon_partner"
+                android:src="@drawable/ic_search_not_found"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
