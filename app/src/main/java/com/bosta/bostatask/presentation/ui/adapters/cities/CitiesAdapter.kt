@@ -31,6 +31,12 @@ class CitiesAdapter(
         expandedItems.clear()
     }
 
+    private fun addAllIdsAfterSearch(citiesList: List<CityModel>){
+        for (cityItem in citiesList){
+            expandedItems.add(cityItem.cityId ?: "")
+        }
+    }
+
 
     private var searchQuery: String = ""
     private val originalCitiesList = mutableListOf<CityModel>()
@@ -44,6 +50,8 @@ class CitiesAdapter(
         } else originalCitiesList
 
         submitList(result)
+        addAllIdsAfterSearch(citiesList = result)
+
         notifyDataSetChanged()
         return result.size
     }
