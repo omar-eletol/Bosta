@@ -41,7 +41,7 @@ class MainViewModel @Inject constructor(
         _citiesState.emit(
             try {
                 val response = getCitiesUseCase.invoke()
-                if (response.data?.isEmpty() == true) MainState.Empty
+                if (response.data.isNullOrEmpty()) MainState.Empty
                 else MainState.Success(data = response)
             } catch (t: Throwable) {
                 MainState.Error(
