@@ -1,6 +1,5 @@
 package com.bosta.bostatask.presentation.ui.adapters.cities
 
-import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import com.bosta.bostatask.databinding.CitiesRowItemBinding
 import com.bosta.bostatask.domain.models.CityModel
@@ -15,7 +14,6 @@ class CitiesAdapterViewHolder(
 
     private val districtsAdapter by lazy { DistrictsAdapter() }
 
-    @SuppressLint("ClickableViewAccessibility")
     fun bind(
         item: CityModel,
         searchQuery: String,
