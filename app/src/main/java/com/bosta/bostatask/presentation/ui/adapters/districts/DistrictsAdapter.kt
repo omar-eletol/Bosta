@@ -3,7 +3,6 @@ package com.bosta.bostatask.presentation.ui.adapters.districts
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bosta.bostatask.databinding.DistrictsRowItemBinding
 import com.bosta.bostatask.domain.models.DistrictModel
 
